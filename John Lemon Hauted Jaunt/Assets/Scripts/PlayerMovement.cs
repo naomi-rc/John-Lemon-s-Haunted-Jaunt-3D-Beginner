@@ -5,11 +5,14 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float turnSpeed = 20f;
+    public GameObject firstPersonCamera;
+    public GameObject thirdPersonCamera;
     Animator m_Animator;
     Vector3 m_Movement; //'m' for member variable, non-public variable    
     Quaternion m_Rotation = Quaternion.identity;
     Rigidbody m_RigidBody;
     AudioSource m_AudioSource;
+    bool m_IsInFirstPerson;
 
     void Start()
     {
@@ -23,7 +26,22 @@ public class PlayerMovement : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
-        m_Movement.Set(horizontal, 0f, vertical);
+        if (Input.GetKeyDown(KeyCode.C))
+        {            
+            firstPersonCamera.SetActive(!firstPersonCamera.activeInHierarchy);
+            thirdPersonCamera.SetActive(!thirdPersonCamera.activeInHierarchy);
+            m_IsInFirstPerson = firstPersonCamera.activeInHierarchy;
+        }
+
+        if (m_IsInFirstPerson)
+        {
+            m_Movement.Set(Input.GetAxis("Mouse X"), 0f, 10f);
+        }
+        else
+        {
+            m_Movement.Set(horizontal, 0f, vertical);
+        }
+        
         m_Movement.Normalize();
 
         bool hasHorizontalInput = !Mathf.Approximately(horizontal, 0f);
@@ -46,6 +64,9 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 desiredForward = Vector3.RotateTowards(transform.forward, m_Movement, turnSpeed * Time.deltaTime, 0f);
         m_Rotation = Quaternion.LookRotation(desiredForward);
+
+
+
     }
 
     void OnAnimatorMove()

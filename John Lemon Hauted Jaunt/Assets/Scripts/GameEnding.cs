@@ -11,7 +11,11 @@ public class GameEnding : MonoBehaviour
     public AudioSource exitAudio;
     public CanvasGroup caughtBackgroundImageCanvasGroup;
     public AudioSource caughtAudio;
+    public CanvasGroup forgotKeysBackgroundImageCanvasGroup;
     public float displayImageDuration = 1f;
+    public Inventory inventory;
+    public HighScoresManager highScoresManager;
+    public TimerController timerController;
     float m_Timer;
     bool m_HasAudioPlayed;
     bool m_IsPlayerAtExit;
@@ -33,9 +37,13 @@ public class GameEnding : MonoBehaviour
 
     private void Update()
     {
-        if (m_IsPlayerAtExit)
+        if (m_IsPlayerAtExit && inventory.CollectedAllKeys())
         {
             EndLevel(exitBackgroundImageCanvasGroup, false, exitAudio);
+        }
+        else if(m_IsPlayerAtExit && !inventory.CollectedAllKeys())
+        {
+            EndLevel(forgotKeysBackgroundImageCanvasGroup, true, caughtAudio);
         }
         else if (m_IsPlayerCaught)
         {
@@ -47,8 +55,9 @@ public class GameEnding : MonoBehaviour
     {
         if(!m_HasAudioPlayed)
         {
+            timerController.Finish();
             audioSource.Play();
-            m_HasAudioPlayed = true;
+            m_HasAudioPlayed = true;            
         }
 
         m_Timer += Time.deltaTime;
@@ -57,11 +66,12 @@ public class GameEnding : MonoBehaviour
         {
             if (doRestart)
             {
-                SceneManager.LoadScene(0);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
             else
             {
-                Application.Quit();
+                highScoresManager.SaveScore(timerController.GetTime()) ; 
+                SceneManager.LoadScene("Menu");
             }            
         }
     }
