@@ -21,27 +21,31 @@ public class PlayerMovement : MonoBehaviour
         m_AudioSource = GetComponent<AudioSource>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
         if (Input.GetKeyDown(KeyCode.C))
-        {            
+        {
             firstPersonCamera.SetActive(!firstPersonCamera.activeInHierarchy);
             thirdPersonCamera.SetActive(!thirdPersonCamera.activeInHierarchy);
             m_IsInFirstPerson = firstPersonCamera.activeInHierarchy;
         }
+    }
 
-        if (m_IsInFirstPerson)
+    void FixedUpdate()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        
+
+        /*if (m_IsInFirstPerson)
         {
             m_Movement.Set(Input.GetAxis("Mouse X"), 0f, 10f);
         }
         else
         {
             m_Movement.Set(horizontal, 0f, vertical);
-        }
-        
+        }*/
+        m_Movement.Set(horizontal, 0f, vertical);
         m_Movement.Normalize();
 
         bool hasHorizontalInput = !Mathf.Approximately(horizontal, 0f);
